@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================
-# Shaurya CA — VPS Deployment Script
+# Shaurya CA — VPS Deployment Script (Apache)
 # =============================================================
 # Usage:  chmod +x deploy.sh && ./deploy.sh
 # Run from the project root (CAshaurya2026/)
@@ -36,7 +36,7 @@ cd ..
 echo ""
 echo "📝 Creating production frontend .env..."
 cat > frontend/.env << 'EOF'
-# Production: API is same origin, proxied through Nginx
+# Production: API is same origin, proxied through Apache
 VITE_API_BASE_URL=https://ca.shauryaiitkgp.in
 EOF
 
@@ -46,22 +46,28 @@ cd frontend
 npm run build
 cd ..
 
-# --- 5. Setup Nginx (if not already done) ---
-NGINX_CONF="/etc/nginx/sites-available/ca.shauryaiitkgp.in"
-if [ ! -f "$NGINX_CONF" ]; then
+# --- 5. Enable required Apache modules ---
+echo ""
+echo "🔧 Enabling required Apache modules..."
+sudo a2enmod proxy proxy_http rewrite headers
+echo "✅ Apache modules enabled."
+
+# --- 6. Setup Apache VirtualHost ---
+APACHE_CONF="/etc/apache2/sites-available/ca.shauryaiitkgp.in.conf"
+if [ ! -f "$APACHE_CONF" ]; then
   echo ""
-  echo "🔧 Setting up Nginx config..."
-  sudo cp nginx/ca.shauryaiitkgp.in.conf "$NGINX_CONF"
-  sudo ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
-  sudo nginx -t && sudo systemctl reload nginx
-  echo "✅ Nginx configured."
+  echo "🔧 Setting up Apache VirtualHost..."
+  sudo cp apache/ca.shauryaiitkgp.in.conf "$APACHE_CONF"
+  sudo a2ensite ca.shauryaiitkgp.in.conf
+  sudo apache2ctl configtest && sudo systemctl reload apache2
+  echo "✅ Apache configured."
 else
-  echo "✅ Nginx config already exists. Reloading..."
-  sudo cp nginx/ca.shauryaiitkgp.in.conf "$NGINX_CONF"
-  sudo nginx -t && sudo systemctl reload nginx
+  echo "✅ Apache config already exists. Updating and reloading..."
+  sudo cp apache/ca.shauryaiitkgp.in.conf "$APACHE_CONF"
+  sudo apache2ctl configtest && sudo systemctl reload apache2
 fi
 
-# --- 6. Start/Restart with PM2 ---
+# --- 7. Start/Restart with PM2 ---
 echo ""
 echo "🚀 Starting backend with PM2..."
 if pm2 describe shaurya-backend > /dev/null 2>&1; then
@@ -79,11 +85,11 @@ echo ""
 echo "Next steps:"
 echo "  1. Make sure MySQL is running and accessible"
 echo "  2. Verify backend .env has correct DB credentials"
-echo "  3. Run: sudo certbot --nginx -d ca.shauryaiitkgp.in  (for SSL)"
-echo "  4. Then uncomment HTTPS block in Nginx config"
+echo "  3. Run: sudo certbot --apache -d ca.shauryaiitkgp.in  (for SSL)"
 echo ""
 echo "Useful commands:"
 echo "  pm2 logs shaurya-backend    — View live logs"
 echo "  pm2 status                  — Check process status"
 echo "  pm2 restart shaurya-backend — Restart backend"
+echo "  sudo tail -f /var/log/apache2/shaurya-error.log  — Apache errors"
 echo ""
