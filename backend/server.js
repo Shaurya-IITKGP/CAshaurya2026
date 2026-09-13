@@ -9,7 +9,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-dotenv.config();
+dotenv.config({ path: __dirname + '/.env' });
 
 const app = express();
 

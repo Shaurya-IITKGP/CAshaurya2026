@@ -1,7 +1,7 @@
 // backend/db.js
 
 
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 const mysql = require("mysql2/promise");
 
 const DB_NAME = process.env.DB_NAME || "ca.shaurya_db";
