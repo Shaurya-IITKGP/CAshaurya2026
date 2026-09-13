@@ -35,13 +35,17 @@ const AboutUs = () => {
   return (
     <div className="w-full relative flex flex-col items-center py-6 text-left min-h-screen overflow-hidden">
       {/* 🎬 Fixed 100% Viewport Edge-to-Edge Background Image Layer */}
-      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
-        <img
-          src="/images/about_us.png"
+      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none max-w-full" style={{ transform: "translateZ(0)" }}>
+        <motion.img
+          initial={{ scale: 1 }}
+          animate={{ scale: 1.04 }}
+          transition={{ duration: 6, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
+          src="/images/C0092T01.JPG"
           alt="About Us Background"
-          className="w-full h-full object-cover object-center opacity-25 filter blur-[1px]"
+          decoding="async"
+          className="w-full h-full object-cover object-center opacity-100"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#121216]/90 to-[#121216]" />
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Centered Content Container */}
@@ -57,13 +61,13 @@ const AboutUs = () => {
             ABOUT US
           </span>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Bungee',sans-serif]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Barlow_Condensed',sans-serif]">
             <span className="block text-white">SHAURYA IIT KHARAGPUR</span>
           </h1>
 
           {/* Official Quote */}
           <div className="py-2">
-            <blockquote className="text-lg sm:text-2xl font-bold italic text-yellow-400 font-['Ubuntu'] tracking-wide">
+            <blockquote className="text-lg sm:text-2xl font-bold italic text-yellow-400 font-['Inter',sans-serif] tracking-wide">
               “Brave hearts write history with courage, not ink”
             </blockquote>
           </div>
@@ -99,7 +103,7 @@ const AboutUs = () => {
                   <IconComponent />
                 </div>
                 <div className="space-y-1.5">
-                  <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors uppercase font-['Ubuntu']">
+                  <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors uppercase font-['Inter',sans-serif]">
                     {item.title}
                   </h3>
                   <p className="text-xs text-gray-300 leading-relaxed">
@@ -122,10 +126,10 @@ const AboutUs = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-yellow-500/20 text-center">
             {stats.map((stat, idx) => (
               <div key={idx} className="flex flex-col items-center space-y-2 pt-4 md:pt-0">
-                <span className="text-4xl sm:text-5xl font-black text-yellow-400 font-['Bungee']">
+                <span className="text-4xl sm:text-5xl font-black text-yellow-400 font-['Barlow_Condensed',sans-serif]">
                   {stat.value}
                 </span>
-                <span className="text-sm font-bold text-gray-200 tracking-wide uppercase font-['Ubuntu']">
+                <span className="text-sm font-bold text-gray-200 tracking-wide uppercase font-['Inter',sans-serif]">
                   {stat.label}
                 </span>
               </div>

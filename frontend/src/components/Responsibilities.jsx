@@ -1,7 +1,17 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Responsibilities = () => {
+  const [bgIndex, setBgIndex] = useState(0);
+  const bgImages = ["/images/C0011T01.JPG", "/images/C0155T01.JPG"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % bgImages.length);
+    }, 3500); // 1.5s transition + 2s static delay
+    return () => clearInterval(interval);
+  }, []);
+
   const duties = [
     {
       num: "01",
@@ -47,14 +57,22 @@ const Responsibilities = () => {
 
   return (
     <div className="w-full relative flex flex-col items-center py-6 text-left min-h-screen overflow-hidden">
-      {/* 🎬 Fixed 100% Viewport Edge-to-Edge Background Image Layer */}
-      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
-        <img
-          src="/images/responsibilities.png"
-          alt="Responsibilities Background"
-          className="w-full h-full object-cover object-center opacity-25 filter blur-[1px]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#121216]/90 to-[#121216]" />
+      {/* 🎬 Fixed 100% Viewport Edge-to-Edge Looping Background Image Layer */}
+      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none bg-black max-w-full" style={{ transform: "translateZ(0)" }}>
+        <AnimatePresence mode="popLayout">
+          <motion.img
+            key={bgIndex}
+            initial={{ opacity: 0, filter: "blur(20px)", scale: 1.1 }}
+            animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+            exit={{ opacity: 0, filter: "blur(20px)", scale: 0.95 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            src={bgImages[bgIndex]}
+            alt="Responsibilities Background"
+            decoding="async"
+            className="absolute top-0 left-0 w-full h-full object-cover object-center"
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
       {/* Centered Content Container */}
@@ -69,7 +87,7 @@ const Responsibilities = () => {
           <span className="text-xs font-extrabold text-yellow-400 uppercase tracking-widest block">
             CAMPUS OUTREACH & LEADERSHIP
           </span>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Bungee',sans-serif]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Barlow_Condensed',sans-serif]">
             <span className="block text-white">YOUR RESPONSIBILITIES AS</span>
             <span className="block text-yellow-400">AMBASSADOR</span>
           </h1>
@@ -103,12 +121,12 @@ const Responsibilities = () => {
                   <span className="text-xs font-extrabold text-yellow-400 uppercase tracking-widest">
                     {item.badge}
                   </span>
-                  <span className="text-2xl font-black text-yellow-400 font-['Bungee']">
+                  <span className="text-2xl font-black text-yellow-400 font-['Barlow_Condensed',sans-serif]">
                     {item.num}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase font-['Ubuntu']">
+                <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors uppercase font-['Inter',sans-serif]">
                   {item.title}
                 </h3>
 

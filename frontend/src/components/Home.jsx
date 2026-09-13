@@ -1,9 +1,39 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import VideoPlayer from "./VideoPlayer";
 
 const Home = () => {
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const heroRef = useRef(null);
+  const videoRef = useRef(null);
+
+  // Auto-pause video when scrolled out of view to eliminate scroll lag & save GPU/CPU cycles
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoEl.play().catch(() => { });
+        } else {
+          videoEl.pause();
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const stats = [
     { value: "500+", label: "PARTICIPANTS REGISTERED" },
     { value: "30+", label: "EXCITING COMPETITIONS" },
@@ -24,14 +54,14 @@ const Home = () => {
       subtitle: "Leadership, Merch & National Exposure",
       desc: "Develop management skills, network with student leaders, climb leaderboard tiers, and earn exclusive rewards.",
       path: "/whyca",
-      image: "/images/why_ca.png",
+      image: "/images/C0062T01.JPG",
     },
     {
       title: "RESPONSIBILITIES",
       subtitle: "Campus Outreach & Contingents",
       desc: "Lead student contingents, manage social media publicity, and represent your college.",
       path: "/responsibilities",
-      image: "/images/responsibilities.png",
+      image: "/images/C0243T01.JPG",
     },
     {
       title: "FREQUENTLY ASKED QUESTIONS",
@@ -66,72 +96,102 @@ const Home = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center text-left">
+    <div className="w-full flex flex-col text-left">
       {/* 🎬 100% FULL SCREEN WIDTH HERO & STATS SECTION WITH VIDEO BACKGROUND */}
-      <div className="w-full relative min-h-[600px] pt-12 pb-16 flex flex-col items-center justify-center overflow-hidden bg-black space-y-12">
-        {/* Background Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-45 z-0 pointer-events-none"
-        >
-          <source src="/background_50mb.mp4" type="video/mp4" />
-        </video>
+      <div
+        ref={heroRef}
+        className="w-full relative min-h-[600px] lg:min-h-[85vh] -mt-16 pt-28 sm:pt-32 pb-8 flex flex-col justify-between overflow-hidden bg-black max-w-full"
+      >
+        {/* 🖼️ Dedicated Fallback Image Layer (Instantly visible, stable background) */}
+        <img
+          src="/images/about_us.png"
+          alt="Shaurya Sports Festival"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none"
+          style={{ transform: "translateZ(0)" }}
+        />
 
-        {/* Hero Content Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="relative z-10 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center px-4 sm:px-8"
-        >
-          {/* Left Column: Clear Text & Call-to-Action */}
-          <div className="lg:col-span-7 space-y-6">
-            <motion.h1
-              variants={itemVariants}
-              className="text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none text-white font-['Bungee',sans-serif]"
-            >
-              IGNITE THE ARENA
-              <span className="block text-yellow-400 mt-2">SHAURYA CA PROGRAM</span>
-            </motion.h1>
+        {/* 🎬 Background Video (Preloads metadata, smoothly fades in when ready to play) */}
+        {!videoError && (
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            onCanPlay={() => setIsVideoLoaded(true)}
+            onLoadedData={() => setIsVideoLoaded(true)}
+            onError={() => setVideoError(true)}
+            className={`absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none block transition-opacity duration-1000 ease-out ${isVideoLoaded ? "opacity-100" : "opacity-0"
+              }`}
+            style={{ transform: "translateZ(0)", willChange: "opacity" }}
+          >
+            <source src="/background_50mb.mp4" type="video/mp4" />
+          </video>
+        )}
 
-            <motion.p
-              variants={itemVariants}
-              className="text-base sm:text-xl text-gray-100 font-medium leading-relaxed max-w-xl"
-            >
-              Be the official face of Shaurya on your campus. Lead student contingents, inspire young athletes, and represent IIT Kharagpur’s annual sports fest.
-            </motion.p>
+        {/* Dark readability overlay */}
+        <div className="absolute inset-0 bg-black/60 z-[1] pointer-events-none" />
 
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-4 pt-2">
-              <Link
-                to="/register"
-                className="px-8 py-3.5 rounded font-extrabold text-sm uppercase text-black bg-yellow-400 hover:bg-yellow-300 transition-colors shadow-lg shadow-yellow-400/30"
+        {/* Bottom fade to blend hero into next section — eliminates the black line gap */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#121216] via-[#121216]/70 to-transparent z-[2] pointer-events-none" />
+
+        {/* Hero Content Grid - Centered vertically in available space */}
+        <div className="flex-grow flex flex-col justify-center w-full">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center px-4 sm:px-8"
+          >
+            {/* Left Column: Clear Text & Call-to-Action */}
+            <div className="lg:col-span-7 space-y-6">
+              <motion.h1
+                variants={itemVariants}
+                className="text-4xl sm:text-6xl font-black uppercase tracking-tight leading-none text-white font-['Barlow_Condensed',sans-serif]"
               >
-                BE A PART OF SHAURYA CA
-              </Link>
-              <Link
-                to="/about"
-                className="px-8 py-3.5 rounded font-extrabold text-sm uppercase text-white border-2 border-yellow-400 hover:bg-yellow-400/20 transition-colors shadow-lg"
-              >
-                EXPLORE PROGRAM
-              </Link>
-            </motion.div>
-          </div>
-        </motion.div>
+                IGNITE THE ARENA
+                <span className="block text-yellow-400 mt-2">SHAURYA CA PROGRAM</span>
+              </motion.h1>
 
-        {/* STATS BANNER */}
+              <motion.p
+                variants={itemVariants}
+                className="text-base sm:text-xl text-gray-100 font-medium leading-relaxed max-w-xl"
+              >
+                Be the official face of Shaurya on your campus. Lead student contingents, inspire young athletes, and represent IIT Kharagpur’s annual sports fest.
+              </motion.p>
+
+              <motion.div variants={itemVariants} className="flex flex-wrap gap-4 pt-2">
+                <Link
+                  to="/register"
+                  className="px-8 py-3.5 rounded font-extrabold text-sm uppercase text-black bg-yellow-400 hover:bg-yellow-300 transition-colors shadow-lg shadow-yellow-400/30"
+                >
+                  BE A PART OF SHAURYA CA
+                </Link>
+                <Link
+                  to="/about"
+                  className="px-8 py-3.5 rounded font-extrabold text-sm uppercase text-white border-2 border-yellow-400 hover:bg-yellow-400/20 transition-colors shadow-lg"
+                >
+                  EXPLORE PROGRAM
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* STATS BANNER - Pinned to the bottom of the hero section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="relative z-10 w-full max-w-7xl px-4 sm:px-8 pt-4"
+          className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 mt-8"
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
             {stats.map((stat, idx) => (
               <div key={idx} className="flex flex-col items-center text-center p-4 border-r border-yellow-500/30 last:border-r-0">
-                <span className="text-3xl sm:text-4xl font-extrabold text-yellow-400 font-['Bungee']">
+                <span className="text-3xl sm:text-4xl font-extrabold text-yellow-400 font-['Barlow_Condensed',sans-serif]">
                   {stat.value}
                 </span>
                 <span className="text-xs font-semibold tracking-wider text-gray-200 mt-1 uppercase">
@@ -144,7 +204,7 @@ const Home = () => {
       </div>
 
       {/* REST OF HOME PAGE CONTENT */}
-      <div className="w-full bg-[#121216] border-t border-yellow-500/20 py-12 flex justify-center">
+      <div className="w-full bg-[#121216] py-12 flex justify-center">
         <div className="w-full max-w-7xl px-4 sm:px-8 space-y-16 flex flex-col items-center">
           {/* PROGRAM PAGES & VERTICALS */}
           <div className="w-full space-y-8 pt-4 pb-4">
@@ -155,7 +215,7 @@ const Home = () => {
               transition={{ duration: 0.6 }}
               className="space-y-2 text-center"
             >
-              <h2 className="text-3xl sm:text-4xl font-extrabold uppercase text-yellow-400 font-['Bungee']">
+              <h2 className="text-3xl sm:text-4xl font-extrabold uppercase text-yellow-400 font-['Barlow_Condensed',sans-serif]">
                 PROGRAM & VERTICALS
               </h2>
               <p className="text-gray-300 text-sm sm:text-base max-w-xl mx-auto">
@@ -194,6 +254,8 @@ const Home = () => {
                       <img
                         src={item.image}
                         alt={item.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
@@ -202,11 +264,11 @@ const Home = () => {
                     <div className="absolute bottom-0 left-0 w-full px-6 pb-6 pt-4 bg-black z-10">
                       {/* Gradient Fade Above Text Body */}
                       <div className="absolute bottom-full left-0 w-full h-24 bg-gradient-to-t from-black to-transparent pointer-events-none" />
-                      
+
                       <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors leading-snug relative z-10">
                         {item.title}
                       </h3>
-                      
+
                       <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows,opacity] duration-500 opacity-0 group-hover:opacity-100 relative z-10">
                         <div className="overflow-hidden">
                           <div className="pt-3 flex flex-col space-y-4">

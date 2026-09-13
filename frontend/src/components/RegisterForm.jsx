@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 export default function RegisterForm() {
   const [form, setForm] = useState({
@@ -94,14 +94,20 @@ export default function RegisterForm() {
 
       const data = await res.json();
       if (!res.ok) {
+        toast.error(data.message || 'Registration failed. Please try again.', {
+          icon: "⚠️",
+        });
         setError({ field: null, message: data.message || 'Something went wrong!' });
       } else {
-        toast.success('Application submitted successfully!');
+        toast.success('Welcome! Application submitted successfully!', {
+          icon: "🎉",
+        });
         setTimeout(() => {
           navigate('/');
-        }, 1500);
+        }, 2000);
       }
     } catch (err) {
+      toast.error('Network error. Please try again.', { icon: "🔌" });
       setError({ field: null, message: 'Network error. Please try again.' });
     } finally {
       setIsSubmitting(false);
@@ -113,7 +119,22 @@ export default function RegisterForm() {
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <ToastContainer 
+        position="bottom-center" 
+        autoClose={4000} 
+        hideProgressBar={false} 
+        newestOnTop={true}
+        closeOnClick
+        theme="dark"
+        toastStyle={{ 
+          backgroundColor: "#000", 
+          color: "#fff", 
+          border: "1px solid rgba(250, 204, 21, 0.4)",
+          borderRadius: "12px",
+          boxShadow: "0 10px 25px -5px rgba(250, 204, 21, 0.1), 0 8px 10px -6px rgba(250, 204, 21, 0.1)"
+        }}
+        progressStyle={{ background: "#facc15" }}
+      />
       <form onSubmit={onSubmit} className="space-y-4 text-left">
         {error && !error.field && (
           <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-semibold">

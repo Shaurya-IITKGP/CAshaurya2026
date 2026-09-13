@@ -11,6 +11,7 @@ const pool = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS || "",
   database: DB_NAME,
+  port: process.env.DBPORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -54,9 +55,17 @@ async function initDB() {
         hasExperience BOOLEAN NOT NULL,
         pastExperience TEXT,
         motivation TEXT NOT NULL,
+        unique_id VARCHAR(255) UNIQUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Safely attempt to add the column to the existing table
+    try {
+      await connection.query(`ALTER TABLE registrations ADD COLUMN unique_id VARCHAR(255) UNIQUE`);
+    } catch (err) {
+      // Ignore if the column already exists
+    }
 
     console.log("✅ Tables for FAQ and Registrations are ready.");
 

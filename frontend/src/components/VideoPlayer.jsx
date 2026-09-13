@@ -3,6 +3,7 @@ import { FaPlay, FaPause, FaVolumeMute, FaVolumeUp, FaExpand } from "react-icons
 
 const VideoPlayer = ({
   src = "/background_50mb.mp4",
+  poster = "/images/about_us.png",
   title = "SHAURYA OFFICIAL TEASER",
   motto = "Yogah Karmasu Kausalam",
 }) => {
@@ -67,14 +68,24 @@ const VideoPlayer = ({
 
   return (
     <div className="relative group w-full aspect-video rounded-3xl overflow-hidden border-2 border-yellow-500/40 hover:border-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.2)] transition-all duration-500 bg-black flex items-center justify-center">
+      {/* Fallback Poster Background Image */}
+      <img
+        src={poster}
+        alt={title}
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+        style={{ transform: "translateZ(0)" }}
+      />
+
       {/* Video Element */}
       <video
         ref={videoRef}
         src={src}
+        poster={poster}
+        preload="metadata"
         playsInline
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => setIsPlaying(false)}
-        className="w-full h-full object-cover cursor-pointer"
+        className="w-full h-full object-cover cursor-pointer relative z-[1]"
         onClick={togglePlay}
       />
 
@@ -97,7 +108,7 @@ const VideoPlayer = ({
 
           {/* Title & Subtitle */}
           <div className="space-y-1">
-            <h4 className="text-lg sm:text-xl font-black text-white font-['Bungee'] tracking-wide">
+            <h4 className="text-lg sm:text-xl font-black text-white font-['Barlow_Condensed',sans-serif] tracking-wide">
               WATCH PROMO FILM
             </h4>
             <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider">
@@ -154,7 +165,7 @@ const VideoPlayer = ({
 
           <div className="flex justify-between items-center pt-1">
             {/* Motto Badge */}
-            <div className="bg-yellow-400 text-black font-black italic px-3 py-1 text-[11px] sm:text-xs font-['Bungee'] uppercase shadow-md transform -skew-x-6">
+            <div className="bg-yellow-400 text-black font-black italic px-3 py-1 text-[11px] sm:text-xs font-['Barlow_Condensed',sans-serif] uppercase shadow-md transform -skew-x-6">
               "{motto}"
             </div>
 

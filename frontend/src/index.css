@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* ── Global Layout & Overflow Defaults ───────────────────────── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Global Font Defaults ─────────────────────────────────────── */
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Performance: reduced-motion ─────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

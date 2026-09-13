@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Lottie from "lottie-react";
 import happyGift from "../assets/happyGift.json";
 import cretificate from "../assets/cretificate.json";
@@ -28,7 +28,7 @@ const FlipCard = ({ animation, title, description }) => {
           style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
         >
           <Lottie animationData={animation} className="w-24 h-24 mb-2" loop />
-          <h3 className="text-lg font-bold text-yellow-400 font-['Ubuntu'] uppercase">
+          <h3 className="text-lg font-bold text-yellow-400 font-['Barlow_Condensed',sans-serif] uppercase">
             {title}
           </h3>
           <span className="text-xs text-gray-400 mt-2 font-semibold flex items-center space-x-1 uppercase tracking-wider">
@@ -54,6 +54,16 @@ const FlipCard = ({ animation, title, description }) => {
 };
 
 const WhyCA = () => {
+  const [bgIndex, setBgIndex] = useState(0);
+  const bgImages = ["/images/C0049T01.JPG", "/images/C0231T01.JPG.jpeg"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % bgImages.length);
+    }, 4500); // 2.5s transition + 2s static delay
+    return () => clearInterval(interval);
+  }, []);
+
   const benefits = [
     {
       num: "01",
@@ -83,14 +93,22 @@ const WhyCA = () => {
 
   return (
     <div className="w-full relative flex flex-col items-center py-6 text-left min-h-screen overflow-hidden">
-      {/* 🎬 Fixed 100% Viewport Edge-to-Edge Background Image Layer */}
-      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
-        <img
-          src="/images/why_ca.png"
-          alt="Why CA Background"
-          className="w-full h-full object-cover object-center opacity-25 filter blur-[1px]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#121216]/90 to-[#121216]" />
+      {/* 🎬 Fixed 100% Viewport Edge-to-Edge Looping Background Image Layer */}
+      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none bg-black max-w-full" style={{ transform: "translateZ(0)" }}>
+        <AnimatePresence mode="popLayout">
+          <motion.img
+            key={bgIndex}
+            initial={{ opacity: 0, scale: bgIndex % 2 === 0 ? 1 : 1.05 }}
+            animate={{ opacity: 1, scale: 1.03 }}
+            exit={{ opacity: 0, scale: bgIndex % 2 === 0 ? 1.05 : 1 }}
+            transition={{ duration: 2.5, ease: "easeInOut" }}
+            src={bgImages[bgIndex]}
+            alt="Why CA Background"
+            decoding="async"
+            className="absolute top-0 left-0 w-full h-full object-cover object-center"
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-black/40" />
       </div>
 
       {/* Centered Content Container */}
@@ -105,7 +123,7 @@ const WhyCA = () => {
           <span className="text-xs font-extrabold text-yellow-400 uppercase tracking-widest block">
             EMPOWER YOUR CAREER
           </span>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Bungee',sans-serif]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Barlow_Condensed',sans-serif]">
             <span className="block text-white">WHY STEP FORWARD AS A</span>
             <span className="block text-yellow-400">SHAURYA CA?</span>
           </h1>
@@ -141,7 +159,7 @@ const WhyCA = () => {
                   </span>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-yellow-400 transition-colors uppercase font-['Ubuntu']">
+                <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-yellow-400 transition-colors uppercase font-['Barlow_Condensed',sans-serif]">
                   {item.title}
                 </h3>
 
@@ -177,7 +195,7 @@ const WhyCA = () => {
           className="w-full space-y-8 pt-8 border-t border-white/10"
         >
           <div className="text-center space-y-2">
-            <h2 className="text-2xl sm:text-4xl font-extrabold uppercase text-yellow-400 font-['Bungee']">
+            <h2 className="text-2xl sm:text-4xl font-extrabold uppercase text-yellow-400 font-['Barlow_Condensed',sans-serif]">
               PROGRAM HIGHLIGHT REWARDS
             </h2>
             <p className="text-sm text-gray-300">

@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 const faqs = [
   {
@@ -27,6 +30,22 @@ const faqs = [
 ];
 
 const FAQ = () => {
+  const mouseX = useMotionValue(typeof window !== "undefined" ? window.innerWidth / 2 : 0);
+  const mouseY = useMotionValue(typeof window !== "undefined" ? window.innerHeight / 2 : 0);
+  const smoothX = useSpring(mouseX, { damping: 20, stiffness: 50 });
+  const smoothY = useSpring(mouseY, { damping: 20, stiffness: 50 });
+  const backgroundX = useTransform(smoothX, [0, typeof window !== "undefined" ? window.innerWidth : 1000], ["-2%", "2%"]);
+  const backgroundY = useTransform(smoothY, [0, typeof window !== "undefined" ? window.innerHeight : 1000], ["-2%", "2%"]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [mouseX, mouseY]);
+
   const [activeIndex, setActiveIndex] = useState(null);
   const [form, setForm] = useState({
     name: '',
@@ -88,9 +107,10 @@ const FAQ = () => {
       setErrors({});
       setSubmitted(true);
       setForm({ name: '', phone: '', email: '', question: '' });
+      toast.success('Thank you! Your question has been submitted.', { icon: "✅" });
     } catch (err) {
       setSubmitted(false);
-      alert('There was an error sending your question. Please try again.');
+      toast.error('There was an error sending your question. Please try again.', { icon: "⚠️" });
     } finally {
       setIsSubmitting(false);
     }
@@ -98,14 +118,32 @@ const FAQ = () => {
 
   return (
     <div className="w-full relative flex flex-col items-center py-6 text-left min-h-screen overflow-hidden">
+      <ToastContainer 
+        position="bottom-center" 
+        autoClose={4000} 
+        hideProgressBar={false} 
+        newestOnTop={true}
+        closeOnClick
+        theme="dark"
+        toastStyle={{ 
+          backgroundColor: "#000", 
+          color: "#fff", 
+          border: "1px solid rgba(250, 204, 21, 0.4)",
+          borderRadius: "12px",
+          boxShadow: "0 10px 25px -5px rgba(250, 204, 21, 0.1), 0 8px 10px -6px rgba(250, 204, 21, 0.1)"
+        }}
+        progressStyle={{ background: "#facc15" }}
+      />
       {/* 🎬 Fixed 100% Viewport Edge-to-Edge Background Image Layer (No zoom on content expand) */}
-      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
-        <img
-          src="/images/faqs.png"
+      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none max-w-full" style={{ transform: "translateZ(0)" }}>
+        <motion.img
+          style={{ x: backgroundX, y: backgroundY, scale: 1.05 }}
+          src="/images/C0016T01.JPG"
           alt="FAQs Background"
-          className="w-full h-full object-cover object-center opacity-25 filter blur-[1px]"
+          decoding="async"
+          className="w-full h-full object-cover object-center opacity-100"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#121216]/90 to-[#121216]" />
+        <div className="absolute inset-0 bg-black/50" />
       </div>
 
       {/* Centered Content Container */}
@@ -120,7 +158,7 @@ const FAQ = () => {
           <span className="text-xs font-extrabold text-yellow-400 uppercase tracking-widest block">
             NEED CLARIFICATION?
           </span>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Bungee',sans-serif]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Barlow_Condensed',sans-serif]">
             <span className="block text-white">FREQUENTLY ASKED</span>
             <span className="block text-yellow-400">QUESTIONS</span>
           </h1>
@@ -150,7 +188,7 @@ const FAQ = () => {
               className="bg-black border border-yellow-500/20 hover:border-yellow-400 rounded-2xl overflow-hidden shadow-lg transition-all duration-300"
             >
               <button
-                className="w-full p-6 text-left flex justify-between items-center text-sm sm:text-base font-extrabold uppercase font-['Ubuntu'] text-white hover:text-yellow-400 transition-colors"
+                className="w-full p-6 text-left flex justify-between items-center text-sm sm:text-base font-extrabold uppercase font-['Inter',sans-serif] text-white hover:text-yellow-400 transition-colors"
                 onClick={() => toggle(index)}
               >
                 <span>{faq.question}</span>
@@ -191,7 +229,7 @@ const FAQ = () => {
           className="w-full max-w-2xl mt-4 p-8 rounded-2xl bg-black border border-yellow-500/20 hover:border-yellow-400/50 shadow-2xl transition-all duration-300 space-y-6"
         >
           <div className="text-center space-y-1">
-            <h3 className="text-2xl font-black text-yellow-400 font-['Bungee'] uppercase">
+            <h3 className="text-2xl font-black text-yellow-400 font-['Barlow_Condensed',sans-serif] uppercase">
               HAVE A QUESTION? ASK US DIRECTLY
             </h3>
             <p className="text-xs text-gray-300">
@@ -199,11 +237,6 @@ const FAQ = () => {
             </p>
           </div>
 
-          {submitted && (
-            <div className="p-3 rounded-xl bg-green-500/20 border border-green-500/40 text-green-300 text-sm font-semibold text-center">
-              Your question has been submitted successfully!
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

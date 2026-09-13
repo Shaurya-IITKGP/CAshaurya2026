@@ -6,10 +6,11 @@ export default function Register() {
   return (
     <div className="w-full relative flex flex-col items-center py-6 text-left min-h-screen overflow-hidden">
       {/* 🎬 Fixed 100% Viewport Edge-to-Edge Background Image Layer */}
-      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none max-w-full" style={{ transform: "translateZ(0)" }}>
         <img
           src="/images/apply_now.png"
           alt="Register Background"
+          decoding="async"
           className="w-full h-full object-cover object-center opacity-25 filter blur-[1px]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-[#121216]/90 to-[#121216]" />
@@ -27,7 +28,7 @@ export default function Register() {
           <span className="text-xs font-extrabold text-yellow-400 uppercase tracking-widest block">
             JOIN THE CHAMPIONS NETWORK
           </span>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Bungee',sans-serif]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight font-['Barlow_Condensed',sans-serif]">
             <span className="block text-white">APPLY TO REPRESENT</span>
             <span className="block text-yellow-400">SHAURYA</span>
           </h1>
@@ -46,7 +47,7 @@ export default function Register() {
             className="lg:col-span-5 space-y-6"
           >
             <div className="p-8 rounded-2xl bg-black border border-yellow-500/20 hover:border-yellow-400 transition-all duration-300 space-y-6 shadow-xl">
-              <h3 className="text-2xl font-black text-yellow-400 font-['Bungee'] uppercase">
+              <h3 className="text-2xl font-black text-yellow-400 font-['Barlow_Condensed',sans-serif] uppercase">
                 WHY REGISTER TODAY?
               </h3>
               <div className="space-y-4">

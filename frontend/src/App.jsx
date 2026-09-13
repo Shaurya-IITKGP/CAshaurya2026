@@ -22,11 +22,11 @@ const ScrollToTop = () => {
 
 const MainContent = () => {
   return (
-    <div className="relative text-white bg-black min-h-screen flex flex-col font-['Poppins'] selection:bg-yellow-400 selection:text-black overflow-x-hidden">
+    <div className="relative text-white bg-black min-h-screen flex flex-col font-['Inter',sans-serif] selection:bg-yellow-400 selection:text-black overflow-x-hidden">
       <ScrollToTop />
       <Navbar />
 
-      <main className="flex-grow pt-16 pb-12 w-full z-10 bg-[#121216]">
+      <main className="flex-grow pt-16 w-full z-10">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />

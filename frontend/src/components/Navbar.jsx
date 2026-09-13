@@ -15,11 +15,11 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-yellow-500/30">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-yellow-500/30 w-full max-w-full overflow-x-hidden">
       {/* 🖤 Header Nav */}
-      <nav className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Left: Logo & Title */}
-        <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center space-x-3 group">
+        <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center space-x-3 group shrink-0">
           <img src="/logos/Shaurya_Logo.png" alt="Shaurya Logo" className="w-10 h-auto group-hover:scale-105 transition-transform" />
           <div className="flex flex-col">
             <span className="font-black text-lg tracking-wider text-white">
@@ -32,7 +32,7 @@ const Navbar = () => {
         </Link>
 
         {/* Center: Desktop Navigation Links */}
-        <div className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-xs font-bold tracking-wider">
+        <div className="hidden lg:flex items-center space-x-4 xl:space-x-8 text-xs font-bold tracking-wider">
           {links.map((link) => {
             const isActive = location.pathname === link.path;
             return (
