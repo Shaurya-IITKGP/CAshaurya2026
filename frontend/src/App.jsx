@@ -10,6 +10,7 @@ import WhyCA from "./components/WhyCA";
 import Responsibilities from "./components/Responsibilities";
 import FAQ from "./components/FAQs";
 import Register from "./components/Register";
+import Admin from "./components/Admin";
 
 // Helper component to scroll to top on route change
 const ScrollToTop = () => {
@@ -26,7 +27,7 @@ const MainContent = () => {
       <ScrollToTop />
       <Navbar />
 
-      <main className="flex-grow pt-16 w-full z-10">
+      <main className="flex-grow pt-16 w-full">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
@@ -34,6 +35,7 @@ const MainContent = () => {
           <Route path="/responsibilities" element={<Responsibilities />} />
           <Route path="/faqs" element={<FAQ />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>
 

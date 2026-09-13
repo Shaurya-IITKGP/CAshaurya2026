@@ -6,24 +6,48 @@ const mysql = require("mysql2/promise");
 
 const DB_NAME = process.env.DB_NAME || "ca.shaurya_db";
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
+const isCloudDB = process.env.DB_HOST?.includes("aivencloud.com") || process.env.DB_SSL === "true";
+
+const connectionConfig = {
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
   password: process.env.DB_PASS || "",
-  database: DB_NAME,
-  port: process.env.DBPORT || 3306,
+  port: Number(process.env.DB_PORT || process.env.DBPORT || 3306),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  ssl: isCloudDB ? { rejectUnauthorized: false } : undefined,
+};
+
+const pool = mysql.createPool({
+  ...connectionConfig,
+  database: DB_NAME,
 });
 
 async function initDB() {
   try {
-    const connection = await pool.getConnection();
+    let connection;
+    try {
+      connection = await pool.getConnection();
+    } catch (connErr) {
+      if (connErr.code === 'ER_BAD_DB_ERROR') {
+        const rootPool = mysql.createPool(connectionConfig);
+        const rootConn = await rootPool.getConnection();
+        await rootConn.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
+        rootConn.release();
+        await rootPool.end();
+        connection = await pool.getConnection();
+      } else {
+        throw connErr;
+      }
+    }
 
-    // Create database if not exists
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
-    await connection.query(`USE \`${DB_NAME}\``);
+    try {
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
+      await connection.query(`USE \`${DB_NAME}\``);
+    } catch (dbErr) {
+      // Ignore if database is pre-selected
+    }
 
     console.log(`✅ Database "${DB_NAME}" is ready.`);
 

@@ -7,12 +7,13 @@ const dotenv = require('dotenv');
 const db = require('./db'); // import after dotenv
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 dotenv.config();
 
 const app = express();
 
-// ✅ Trust proxy (important if CIC puts Nginx/Apache in front)
+// ✅ Trust proxy (important when Nginx is in front)
 app.set('trust proxy', 1);
 
 // Allowed origins (update with your actual frontend domains)
@@ -36,26 +37,26 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Rate limiter (10 requests/minute per IP)
-const limiter = rateLimit({
+// ✅ API rate limiter (100 requests/minute per IP for API routes)
+const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 10,
-  message: 'Too many requests, please try again later.',
+  max: 100,
+  message: { message: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use(limiter);
 
-// --- DB test route (add here) ---
-app.get('/db-test', async (req, res) => {
-  try {
-    const { pool } = require('./db');
-    const [rows] = await pool.query('SELECT NOW() AS currentTime');
-    res.json({ success: true, dbTime: rows[0].currentTime });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
+// ✅ Stricter rate limiter for registration (10 per minute per IP)
+const registrationLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { message: 'Too many registration attempts, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
+
+// Apply general API limiter to all /api routes
+app.use('/api', apiLimiter);
 
 const { initDB } = require('./db');
 initDB();
@@ -63,10 +64,15 @@ initDB();
 // ✅ Routes
 app.use('/api/register', require('./routes/register'));
 app.use('/api/faq', require('./routes/faq'));
+app.use('/api/admin', require('./routes/admin'));
 
-// ✅ Root health check
-app.get('/', (req, res) => {
-  res.send('✅ Shaurya backend is running with MySQL');
+// ✅ Serve frontend static files in production
+const frontendDistPath = path.join(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(frontendDistPath));
+
+// ✅ SPA fallback — serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
 
 // ✅ Server

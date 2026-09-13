@@ -19,8 +19,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// ✅ GET all registrations
+// ✅ GET all registrations (protected)
 router.get('/', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== `Bearer ${process.env.ADMIN_TOKEN}`) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
   try {
     const registrations = await getAllRegistrations();
     res.json(registrations);
