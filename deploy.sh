@@ -12,10 +12,16 @@ echo "=============================="
 echo "  Shaurya CA — VPS Deploy"
 echo "=============================="
 
+# --- Pre-flight Checks ---
+if [ ! -d ".git" ] || [ ! -d "backend" ] || [ ! -d "frontend" ]; then
+  echo "❌ Error: This script must be run from the project root directory (CAshaurya2026)."
+  exit 1
+fi
+
 # --- 1. Pull latest code ---
 echo ""
-echo "📥 Pulling latest code..."
-git pull origin main
+echo "📥 Pulling latest code from master..."
+git pull origin master
 
 # --- 2. Install backend production deps ---
 echo ""
@@ -24,15 +30,7 @@ cd backend
 npm install --production
 cd ..
 
-# --- 3. Build frontend ---
-echo ""
-echo "🔨 Building frontend..."
-cd frontend
-npm install
-npm run build
-cd ..
-
-# --- 4. Create production .env for frontend ---
+# --- 3. Create production .env for frontend & Build ---
 echo ""
 echo "📝 Creating production frontend .env..."
 cat > frontend/.env << 'EOF'
@@ -40,19 +38,19 @@ cat > frontend/.env << 'EOF'
 VITE_API_BASE_URL=https://ca.shauryaiitkgp.in
 EOF
 
-# Re-build with production env
-echo "🔨 Rebuilding frontend with production env..."
+echo "🔨 Building frontend..."
 cd frontend
+npm install
 npm run build
 cd ..
 
-# --- 5. Enable required Apache modules ---
+# --- 4. Enable required Apache modules ---
 echo ""
 echo "🔧 Enabling required Apache modules..."
 sudo a2enmod proxy proxy_http rewrite headers
 echo "✅ Apache modules enabled."
 
-# --- 6. Setup Apache VirtualHost ---
+# --- 5. Setup Apache VirtualHost ---
 APACHE_CONF="/etc/apache2/sites-available/ca.shauryaiitkgp.in.conf"
 if [ ! -f "$APACHE_CONF" ]; then
   echo ""
@@ -67,11 +65,12 @@ else
   sudo apache2ctl configtest && sudo systemctl reload apache2
 fi
 
-# --- 7. Start/Restart with PM2 ---
+# --- 6. Start/Restart with PM2 ---
 echo ""
-echo "🚀 Starting backend with PM2..."
+echo "🚀 Starting/Restarting backend with PM2..."
+# Explicitly target shaurya-backend. Do NOT touch shaurya-api.
 if pm2 describe shaurya-backend > /dev/null 2>&1; then
-  pm2 restart ecosystem.config.cjs
+  pm2 restart shaurya-backend
 else
   pm2 start ecosystem.config.cjs
 fi
@@ -83,7 +82,7 @@ echo "  ✅ Deployment Complete!"
 echo "=============================="
 echo ""
 echo "Next steps:"
-echo "  1. Make sure MySQL is running and accessible"
+echo "  1. Make sure MySQL is running and accessible (port 3306)"
 echo "  2. Verify backend .env has correct DB credentials"
 echo "  3. Run: sudo certbot --apache -d ca.shauryaiitkgp.in  (for SSL)"
 echo ""
