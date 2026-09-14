@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'shaurya-backend',
+      name: 'ca-shaurya-backend',
       script: './backend/server.js',
       cwd: __dirname,
       instances: 1,
