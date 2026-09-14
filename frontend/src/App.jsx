@@ -11,6 +11,7 @@ import Responsibilities from "./components/Responsibilities";
 import FAQ from "./components/FAQs";
 import Register from "./components/Register";
 import Admin from "./components/Admin";
+import NotFound from "./components/NotFound";
 
 // Helper component to scroll to top on route change
 const ScrollToTop = () => {
@@ -36,6 +37,7 @@ const MainContent = () => {
           <Route path="/faqs" element={<FAQ />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 

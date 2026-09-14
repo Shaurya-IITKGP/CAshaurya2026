@@ -50,6 +50,22 @@ export default function RegisterForm() {
     if (name === 'phone') {
       const digitsOnly = value.replace(/\D/g, '').slice(0, 10);
       setForm((f) => ({ ...f, phone: digitsOnly }));
+    } else if (name === 'dob') {
+      let val = value;
+      // Allow backspacing over slashes
+      if (val.length < form.dob.length) {
+        setForm((f) => ({ ...f, dob: val }));
+      } else {
+        val = val.replace(/\D/g, '');
+        if (val.length > 8) val = val.slice(0, 8);
+        let formatted = val;
+        if (val.length >= 5) {
+          formatted = `${val.slice(0, 2)}/${val.slice(2, 4)}/${val.slice(4)}`;
+        } else if (val.length >= 3) {
+          formatted = `${val.slice(0, 2)}/${val.slice(2)}`;
+        }
+        setForm((f) => ({ ...f, dob: formatted }));
+      }
     } else {
       setForm((f) => ({ ...f, [name]: value }));
     }
@@ -59,9 +75,17 @@ export default function RegisterForm() {
   const validate = () => {
     if (!form.fullName.trim()) return { field: 'fullName', message: 'Full name is required' };
     if (!form.gender) return { field: 'gender', message: 'Please select your gender' };
-    if (!form.dob || isNaN(new Date(form.dob))) return { field: 'dob', message: 'Invalid date of birth' };
-    const dobDate = new Date(form.dob);
+    
+    let dobDate;
+    if (form.dob) {
+      const parts = form.dob.split('/');
+      if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+        dobDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}T00:00:00`);
+      }
+    }
+    if (!dobDate || isNaN(dobDate.getTime())) return { field: 'dob', message: 'Invalid date of birth (DD/MM/YYYY)' };
     if (dobDate >= new Date()) return { field: 'dob', message: 'Date of birth must be in the past' };
+    
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(form.email)) return { field: 'email', message: 'Enter a valid email address' };
     if (!form.phone.trim()) return { field: 'phone', message: 'Phone number is required' };
@@ -88,11 +112,21 @@ export default function RegisterForm() {
     }
 
     setIsSubmitting(true);
+    
+    // Format dob to YYYY-MM-DD for backend
+    const payload = { ...form };
+    if (payload.dob) {
+      const parts = payload.dob.split('/');
+      if (parts.length === 3) {
+        payload.dob = `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+
     try {
       const res = await fetch(`${API_BASE}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -176,7 +210,15 @@ export default function RegisterForm() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div ref={refs.dob}>
             <label className={labelStyle}>Date of Birth *</label>
-            <input type="date" name="dob" value={form.dob} onChange={onChange} className={inputStyle} />
+            <input 
+              type="text" 
+              name="dob" 
+              placeholder="DD/MM/YYYY"
+              value={form.dob}
+              onChange={onChange} 
+              className={inputStyle} 
+              maxLength="10"
+            />
             {error?.field === 'dob' && <div className="text-red-400 text-xs mt-1">{error.message}</div>}
           </div>
 

@@ -6,6 +6,7 @@ import VideoPlayer from "./VideoPlayer";
 const Home = () => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [activeCard, setActiveCard] = useState(null);
   const heroRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -190,7 +191,12 @@ const Home = () => {
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
             {stats.map((stat, idx) => (
-              <div key={idx} className="flex flex-col items-center text-center p-4 border-r border-yellow-500/30 last:border-r-0">
+              <div 
+                key={idx} 
+                className={`flex flex-col items-center text-center p-4 border-yellow-500/30 ${
+                  idx === stats.length - 1 ? "" : idx % 2 === 0 ? "border-r" : "md:border-r"
+                }`}
+              >
                 <span className="text-3xl sm:text-4xl font-extrabold text-yellow-400 font-['Barlow_Condensed',sans-serif]">
                   {stat.value}
                 </span>
@@ -247,7 +253,16 @@ const Home = () => {
                 >
                   <Link
                     to={item.path}
-                    className="group relative rounded-2xl bg-black border border-yellow-500/20 text-left transition-all duration-300 hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.2)] block overflow-hidden h-[380px]"
+                    onClick={(e) => {
+                      // Apply double-tap logic only if the primary input mechanism cannot hover (i.e. touchscreens)
+                      if (window.matchMedia('(hover: none)').matches && activeCard !== idx) {
+                        e.preventDefault();
+                        setActiveCard(idx);
+                      }
+                    }}
+                    className={`group relative rounded-2xl bg-black border text-left transition-all duration-300 hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.2)] block overflow-hidden h-[380px] ${
+                      activeCard === idx ? 'border-yellow-400 shadow-[0_0_25px_rgba(250,204,21,0.2)]' : 'border-yellow-500/20'
+                    }`}
                   >
                     {/* Image Background */}
                     <div className="absolute inset-0 w-full h-full bg-gray-900">
@@ -256,7 +271,9 @@ const Home = () => {
                         alt={item.title}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                        className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 ${
+                          activeCard === idx ? 'scale-105' : ''
+                        }`}
                       />
                     </div>
 
@@ -265,11 +282,15 @@ const Home = () => {
                       {/* Gradient Fade Above Text Body */}
                       <div className="absolute bottom-full left-0 w-full h-24 bg-gradient-to-t from-black to-transparent pointer-events-none" />
 
-                      <h3 className="text-xl font-bold text-white group-hover:text-yellow-400 transition-colors leading-snug relative z-10">
+                      <h3 className={`text-xl font-bold transition-colors leading-snug relative z-10 group-hover:text-yellow-400 ${
+                        activeCard === idx ? 'text-yellow-400' : 'text-white'
+                      }`}>
                         {item.title}
                       </h3>
 
-                      <div className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-[grid-template-rows,opacity] duration-500 opacity-0 group-hover:opacity-100 relative z-10">
+                      <div className={`grid transition-[grid-template-rows,opacity] duration-500 relative z-10 group-hover:grid-rows-[1fr] group-hover:opacity-100 ${
+                        activeCard === idx ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                      }`}>
                         <div className="overflow-hidden">
                           <div className="pt-3 flex flex-col space-y-4">
                             <p className="text-sm text-gray-300 leading-relaxed">
@@ -277,7 +298,9 @@ const Home = () => {
                             </p>
                             <div className="flex items-center text-xs font-bold text-yellow-400 uppercase">
                               <span>Explore</span>
-                              <svg className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className={`w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-1 ${
+                                activeCard === idx ? 'translate-x-1' : ''
+                              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                               </svg>
                             </div>
