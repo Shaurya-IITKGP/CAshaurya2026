@@ -97,7 +97,7 @@ const AboutUs = () => {
                   hidden: { opacity: 0, y: 25 },
                   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
                 }}
-                className="p-6 rounded-2xl bg-black border border-yellow-500/20 hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.2)] transition-all duration-300 flex items-start space-x-5 group"
+                className="p-6 rounded-2xl bg-black/60 backdrop-blur-md border border-yellow-500/20 hover:border-yellow-400 hover:shadow-[0_0_25px_rgba(250,204,21,0.2)] transition-all duration-300 flex items-start space-x-5 group"
               >
                 <div className="p-4 rounded-xl bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 text-2xl group-hover:bg-yellow-400 group-hover:text-black transition-colors flex-shrink-0">
                   <IconComponent />
@@ -121,18 +121,26 @@ const AboutUs = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-5xl bg-black border border-yellow-500/30 rounded-2xl p-8 shadow-2xl"
+          className="w-full max-w-5xl bg-black/60 backdrop-blur-md border border-yellow-500/30 rounded-2xl p-8 shadow-2xl"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-yellow-500/20 text-center">
+          <div className="flex flex-col md:flex-row items-center justify-between w-full text-center">
             {stats.map((stat, idx) => (
-              <div key={idx} className="flex flex-col items-center space-y-2 pt-4 md:pt-0">
-                <span className="text-4xl sm:text-5xl font-black text-yellow-400 font-['Barlow_Condensed',sans-serif]">
-                  {stat.value}
-                </span>
-                <span className="text-sm font-bold text-gray-200 tracking-wide uppercase font-['Inter',sans-serif]">
-                  {stat.label}
-                </span>
-              </div>
+              <React.Fragment key={idx}>
+                <div className="flex flex-col items-center space-y-2 py-6 md:py-0 w-full">
+                  <span className="text-4xl sm:text-5xl font-black text-yellow-400 font-['Barlow_Condensed',sans-serif]">
+                    {stat.value}
+                  </span>
+                  <span className="text-sm font-bold text-gray-200 tracking-wide uppercase font-['Inter',sans-serif]">
+                    {stat.label}
+                  </span>
+                </div>
+                {idx < stats.length - 1 && (
+                  <>
+                    <div className="w-full h-px bg-yellow-500/20 md:hidden" />
+                    <div className="hidden md:block w-px h-16 bg-yellow-500/20" />
+                  </>
+                )}
+              </React.Fragment>
             ))}
           </div>
         </motion.div>

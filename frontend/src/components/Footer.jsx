@@ -22,7 +22,7 @@ const Footer = () => {
       email: 'sutirthajana.shaurya.iitkgp@gmail.com',
     },
     {
-      name: 'Aravind Naik Kethavath',
+      name: 'Aravind Naik ',
       role: 'PUBLICITY & MARKETING HEAD',
       image: '/logos/Arvind.jpg',
       linkedin: 'https://www.linkedin.com/in/aravind-naik-kethavath-67a5b8350?utm_source=share_via&utm_content=profile&utm_medium=member_ios',
