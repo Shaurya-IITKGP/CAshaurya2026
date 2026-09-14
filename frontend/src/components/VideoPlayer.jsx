@@ -3,7 +3,7 @@ import { FaPlay, FaPause, FaVolumeMute, FaVolumeUp, FaExpand } from "react-icons
 
 const VideoPlayer = ({
   src = "/background_50mb.mp4",
-  poster = "/images/about_us.png",
+  poster = "/images/fallback_poster.png",
   title = "SHAURYA OFFICIAL TEASER",
   motto = "Yogah Karmasu Kausalam",
 }) => {

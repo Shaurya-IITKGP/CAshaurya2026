@@ -104,7 +104,7 @@ const Home = () => {
       >
         {/* 🖼️ Dedicated Fallback Image Layer (Instantly visible, stable background) */}
         <img
-          src="/images/about_us.png"
+          src="/images/fallback_poster.png"
           alt="Shaurya Sports Festival"
           fetchPriority="high"
           decoding="async"

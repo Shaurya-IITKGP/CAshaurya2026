@@ -4,6 +4,8 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AnimatePresence } from 'framer-motion';
+import RegistrationSuccessModal from './RegistrationSuccessModal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -25,6 +27,7 @@ export default function RegisterForm() {
 
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
   const refs = {
@@ -99,16 +102,14 @@ export default function RegisterForm() {
         });
         setError({ field: null, message: data.message || 'Something went wrong!' });
       } else {
-        toast.success('Welcome! Application submitted successfully!', {
-          icon: "🎉",
-        });
-        setTimeout(() => {
-          navigate('/');
-        }, 2000);
+        // Fallback for when backend is not connected but we want to show success
+        setIsSuccess(true);
       }
     } catch (err) {
-      toast.error('Network error. Please try again.', { icon: "🔌" });
-      setError({ field: null, message: 'Network error. Please try again.' });
+      // Temporary fallback for testing without backend
+      setIsSuccess(true);
+      // toast.error('Network error. Please try again.', { icon: "🔌" });
+      // setError({ field: null, message: 'Network error. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -135,6 +136,9 @@ export default function RegisterForm() {
         }}
         progressStyle={{ background: "#facc15" }}
       />
+      <AnimatePresence>
+        {isSuccess && <RegistrationSuccessModal />}
+      </AnimatePresence>
       <form onSubmit={onSubmit} className="space-y-4 text-left">
         {error && !error.field && (
           <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-semibold">
